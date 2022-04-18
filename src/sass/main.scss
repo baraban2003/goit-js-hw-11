@@ -4,4 +4,79 @@
  */
 
 // Стили для файла с примером HTML-фрагмента
-@import './example';
+//@import './example';
+h1 {
+    display: none;
+
+}
+
+header {
+    background-color: #065ba0;
+    padding: 20px 0 20px 0;
+    display: flex;
+    justify-content: center;
+   box-shadow:0px 2px 2px #06376f;
+}
+.search-form {
+    display: flex;
+    
+}
+
+.search-form input{
+    width: 280px;
+    height: 30px;
+    border-radius: 3px 0 0 3px;
+    padding-right: 0;
+      border: 1px;
+}
+.search-form button{
+    width: 30px;
+    height: 30px;
+    border-radius: 0 3px 3px 0;
+    padding: 0;
+    margin: 0;
+    padding-left: 0;
+    border: 1px;
+    
+}
+
+.gallery {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.gallery-item>img {
+    height: 200px;
+}
+.photo-card {
+    margin: 15px;
+    border: 1px solid #eeeeee;
+    box-shadow: 0px 1px 1px #434547;
+}
+.info {
+    display: flex;
+    justify-content: space-around;
+}
+.info-item {
+    text-align: center;
+    line-height: 1.7;
+    
+    }
+.load {
+    display: flex;
+    justify-content: center;
+    margin-top: 10px;
+    margin-bottom: 25px;
+}
+.load .load-more{
+    color: #eeeeee;
+    background-color: #065ba0;
+     border-radius: 3px;
+     width: 120px;
+     height: 30px;
+      border: 1px;
+}
+.is-hidden {
+  display: none;
+}
