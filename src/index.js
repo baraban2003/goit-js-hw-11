@@ -32,7 +32,7 @@ function onSearch(event) {
   galleryDivStructure.innerHTML = '';
   loadMoreBtn.disable();
 
-  let inputForSearch = inputData.value;
+  let inputForSearch = inputData.value.trim();
   inputForNextPage = inputForSearch;
   numberForNextPage = 1;
 
@@ -47,9 +47,11 @@ function renderPictures(pictures) {
   let pictureCounter = pictures.data.hits.length;
   let totalPictures = pictures.data.totalHits;
 
-  if (!pictureCounter) {
+  if (!pictureCounter || inputForNextPage === '') {
     Notify.failure('Sorry, there are no images matching your search query. Please try again.');
     loadMoreBtn.hide();
+    inputData.value = '';
+    return;
   }
 
   if (pictureCounter > 0) {
@@ -95,7 +97,7 @@ function renderPictures(pictures) {
       })
       .join('');
     galleryDivStructure.insertAdjacentHTML('beforeend', markupDivInfo);
-
+    inputData.value = '';
     //add smoozy scroll
     const { height: cardHeight } = document
       .querySelector('.gallery')
