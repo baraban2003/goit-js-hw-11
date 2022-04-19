@@ -2,6 +2,7 @@ import './sass/main.scss';
 import fetchPictures from './js/fetchPictures';
 import { Notify } from 'notiflix/build/notiflix-notify-aio';
 import SimpleLightbox from 'simplelightbox';
+import 'simplelightbox/dist/simple-lightbox.min.css';
 import LoadMoreBtn from './js/load-more-btn';
 
 // fetchPictures('beautiful girls');
@@ -14,6 +15,7 @@ const refs = {
 };
 let inputForNextPage = '';
 let numberForNextPage = 1;
+let ifShowedMessage = true;
 
 const { inputData, galleryDivStructure, buttonSearch, loadMoreButton } = refs;
 
@@ -25,8 +27,10 @@ const loadMoreBtn = new LoadMoreBtn({
 buttonSearch.addEventListener('click', onSearch);
 
 function onSearch(event) {
-  loadMoreBtn.disable();
   event.preventDefault();
+  ifShowedMessage = true;
+  galleryDivStructure.innerHTML = '';
+  loadMoreBtn.disable();
 
   let inputForSearch = inputData.value;
   inputForNextPage = inputForSearch;
@@ -41,13 +45,25 @@ function onSearch(event) {
 
 function renderPictures(pictures) {
   let pictureCounter = pictures.data.hits.length;
+  let totalPictures = pictures.data.totalHits;
 
-  if (pictureCounter === 0) {
+  if (!pictureCounter) {
     Notify.failure('Sorry, there are no images matching your search query. Please try again.');
-  } else {
+    loadMoreBtn.hide();
+  }
+
+  if (pictureCounter > 0) {
+    //После первого запроса при каждом новом поиске выводить уведомление
+    //в котором будет написано сколько всего нашли изображений(свойство totalHits)
+    if (ifShowedMessage) {
+      Notify.success(`Hooray! We found ${totalPictures} images.`);
+      ifShowedMessage = false;
+    }
+
     loadMoreBtn.enable();
     loadMoreBtn.show();
 
+    //add html structure
     const markupDivInfo = pictures.data.hits
       .map(({ webformatURL, largeImageURL, tags, likes, views, comments, downloads }) => {
         return `
@@ -78,9 +94,31 @@ function renderPictures(pictures) {
             </div>`;
       })
       .join('');
-    galleryDivStructure.innerHTML = markupDivInfo;
+    galleryDivStructure.insertAdjacentHTML('beforeend', markupDivInfo);
+
+    //add smoozy scroll
+    const { height: cardHeight } = document
+      .querySelector('.gallery')
+      .firstElementChild.getBoundingClientRect();
+
+    window.scrollBy({
+      top: cardHeight * 0.25,
+      behavior: 'smooth',
+    });
+
+    //Add lightBox
+    let lightbox = new SimpleLightbox('.photo-card a', {
+      close: true,
+      captions: true,
+    });
+  }
+  if (pictureCounter < 40 && pictureCounter > 0) {
+    loadMoreBtn.hide();
+    Notify.info("We're sorry, but you've reached the end of search results.");
   }
 }
+
+//add load more functionality
 loadMoreButton.addEventListener('click', loadMore);
 
 function loadMore(event) {
@@ -88,6 +126,7 @@ function loadMore(event) {
   event.preventDefault();
 
   numberForNextPage += 1;
+
   return fetchPictures(inputForNextPage, numberForNextPage)
     .then(pictures => renderPictures(pictures))
     .catch(error => {
