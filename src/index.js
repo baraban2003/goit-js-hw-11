@@ -36,6 +36,13 @@ function onSearch(event) {
   inputForNextPage = inputForSearch;
   numberForNextPage = 1;
 
+  if (inputForNextPage === '') {
+    Notify.failure('Sorry, there are no images matching your search query. Please try again.');
+    loadMoreBtn.hide();
+    inputData.value = '';
+    return;
+  }
+
   return fetchPictures(inputForSearch, numberForNextPage)
     .then(pictures => renderPictures(pictures))
     .catch(error => {
@@ -47,7 +54,7 @@ function renderPictures(pictures) {
   let pictureCounter = pictures.data.hits.length;
   let totalPictures = pictures.data.totalHits;
 
-  if (!pictureCounter || inputForNextPage === '') {
+  if (!pictureCounter) {
     Notify.failure('Sorry, there are no images matching your search query. Please try again.');
     loadMoreBtn.hide();
     inputData.value = '';
